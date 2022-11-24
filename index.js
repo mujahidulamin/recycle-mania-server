@@ -23,7 +23,7 @@ async function run() {
         const categories = client.db('recycleMania').collection('categories')
         const productsCollection = client.db('recycleMania').collection('products')
 
-
+        //all categories
         app.get('/categories', async (req, res) => {
             const query = {}
             const category = await categories.find(query).toArray()
