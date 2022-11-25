@@ -22,6 +22,8 @@ async function run() {
     try {
         const categories = client.db('recycleMania').collection('categories')
         const productsCollection = client.db('recycleMania').collection('products')
+        const bookingCollection = client.db('recycleMania').collection('bookings')
+
 
         //all categories
         app.get('/categories', async (req, res) => {
@@ -44,6 +46,22 @@ async function run() {
             const category = await productsCollection.find(query).toArray();
             res.send(category)
         })
+
+
+        // booking collection get api specific data with email
+        //to load in to the buyer my booking route
+
+        
+
+
+
+        // booking collection post api
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
+            const result = await bookingCollection.insertOne(booking)
+            res.send(result)
+        })
+
 
 
 
