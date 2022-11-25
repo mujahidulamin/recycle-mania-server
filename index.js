@@ -20,9 +20,11 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try {
+        //all data collection form database
         const categories = client.db('recycleMania').collection('categories')
         const productsCollection = client.db('recycleMania').collection('products')
         const bookingCollection = client.db('recycleMania').collection('bookings')
+        const usersCollection = client.db('recycleMania').collection('users')
 
 
         //all categories
@@ -39,7 +41,6 @@ async function run() {
             res.send(products)
         })
 
-
         app.get('/category/:id', async (req, res) => {
             const id = req.params.id;
             const query = { id: id };
@@ -47,18 +48,15 @@ async function run() {
             res.send(category)
         })
 
-
         // booking collection get api specific data with email
         //to load in to the buyer my booking route
 
-        app.get('/bookings', async(req, res) => {
+        app.get('/bookings', async (req, res) => {
             const email = req.query.email;
-            const query = {buyerEmail: email};
+            const query = { buyerEmail: email };
             const booking = await bookingCollection.find(query).toArray();
             res.send(booking)
         })
-
-
 
         // booking collection post api
         app.post('/bookings', async (req, res) => {
@@ -68,6 +66,13 @@ async function run() {
         })
 
 
+        //user post with role api
+
+        app.post('/users', async(req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user)
+            res.send(result);
+        })
 
 
 
