@@ -51,7 +51,12 @@ async function run() {
         // booking collection get api specific data with email
         //to load in to the buyer my booking route
 
-        
+        app.get('/bookings', async(req, res) => {
+            const email = req.query.email;
+            const query = {buyerEmail: email};
+            const booking = await bookingCollection.find(query).toArray();
+            res.send(booking)
+        })
 
 
 
