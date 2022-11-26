@@ -19,25 +19,24 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
+
+//verify jwt token
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
-    if(!authHeader){
+    if (!authHeader) {
         return res.status(401).send('Unauthorized Access');
     }
     const token = authHeader.split(' ')[1];
 
 
-    jwt.verify(token, process.env.ACCESS_TOKEN, function(err, decoded){
-        if(err){
-            return res.status(403).send({message: 'forbidden access'})
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'forbidden access' })
         }
         req.decoded = decoded;
         next()
     })
 }
-
-
-
 
 
 async function run() {
@@ -76,8 +75,8 @@ async function run() {
         app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
             const decodedEmail = req.decoded.email
-            if(email !== decodedEmail){
-                return res.status(403).send({message: 'forbidden access'})
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' })
             }
             const query = { buyerEmail: email };
             const booking = await bookingCollection.find(query).toArray();
@@ -114,7 +113,14 @@ async function run() {
 
 
 
-
+        //get all buyers api        
+        app.get('/buyers', async (req, res) => {
+            const role = req.query.role;
+            console.log(role);
+            const query = { role: role }
+            const users = await usersCollection.find(query).toArray()
+            res.send(users);
+        })
 
     }
     finally {
