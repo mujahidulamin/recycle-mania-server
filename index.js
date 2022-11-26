@@ -120,12 +120,43 @@ async function run() {
             const users = await usersCollection.find(query).toArray()
             res.send(users);
         })
-
+        //get all sellers api    
         app.get('/sellers', async (req, res) => {
             const role = req.query.role;
             const query = { role: role }
             const users = await usersCollection.find(query).toArray()
             res.send(users);
+        })
+
+
+
+        //admin verified api
+        app.get('/buyers/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query)
+            res.send({ isAdmin: user?.role === 'admin' })
+        })
+
+       
+        app.put('/buyers/admin/:id', verifyJWT, async (req, res) => {
+
+            const decodedEmail = req.decoded.email;
+            const filter = { email: decodedEmail }
+            const user = await usersCollection.findOne(filter)
+            if (user?.role !== 'admin') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const options = { upsert: true }
+            const updatedDoc = {
+                $set: {
+                    role: 'admin'
+                }
+            }
+            const result = await usersCollection.updateOne(query, updatedDoc, options)
+            res.send(result)
         })
 
 
