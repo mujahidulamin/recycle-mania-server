@@ -138,7 +138,7 @@ async function run() {
             res.send({ isAdmin: user?.role === 'admin' })
         })
 
-       
+        //make admin api
         app.put('/buyers/admin/:id', verifyJWT, async (req, res) => {
 
             const decodedEmail = req.decoded.email;
