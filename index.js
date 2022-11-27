@@ -46,6 +46,7 @@ async function run() {
         const productsCollection = client.db('recycleMania').collection('products')
         const bookingCollection = client.db('recycleMania').collection('bookings')
         const usersCollection = client.db('recycleMania').collection('users')
+        const reportsCollection = client.db('recycleMania').collection('reports')
 
 
         //all categories
@@ -191,7 +192,7 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/products', async(req, res) => {
+        app.get('/products', async (req, res) => {
             const query = {}
             const products = await productsCollection.find(query).toArray();
             res.send(products)
@@ -199,16 +200,35 @@ async function run() {
 
         //delete a single product form seller dashboard api
 
-        app.delete('/products/:id', async(req, res) => {
+        app.delete('/products/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: ObjectId(id)};
+            const filter = { _id: ObjectId(id) };
             const result = await productsCollection.deleteOne(filter)
             res.send(result);
         })
 
+        //reported item post to database api
+        app.post('/reports', async (req, res) => {
+            const reports = req.body;
+            const result = await reportsCollection.insertOne(reports)
+            res.send(result)
+        })
 
 
+        //get all the reports item
+        app.get('/reports', async(req, res) => {
+            const query = {}
+            const result = await reportsCollection.find(query).toArray();
+            res.send(result); 
+        })
 
+        //delete a single report item api
+        app.delete('/reports/:id', async(req, res) => {
+            const id = req.params.id;
+            const filter = {_id : ObjectId(id)};
+            const result = await reportsCollection.deleteOne(filter);
+            res.send(result)
+        })
 
 
     }
