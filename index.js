@@ -120,6 +120,18 @@ async function run() {
             const users = await usersCollection.find(query).toArray()
             res.send(users);
         })
+
+        //delete all buyers api 
+        app.delete('/buyers/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)}
+            const result = await usersCollection.deleteOne(filter)
+            res.send(result)
+        })
+
+
+
+
         //get all sellers api    
         app.get('/sellers', async (req, res) => {
             const role = req.query.role;
@@ -127,6 +139,9 @@ async function run() {
             const users = await usersCollection.find(query).toArray()
             res.send(users);
         })
+
+
+
 
 
 
