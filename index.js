@@ -121,7 +121,7 @@ async function run() {
             res.send(users);
         })
 
-        //delete all buyers api 
+        //delete single buyer api 
         app.delete('/buyers/:id', async (req, res) => {
             const id = req.params.id;
             const filter = {_id: ObjectId(id)}
@@ -129,6 +129,15 @@ async function run() {
             res.send(result)
         })
 
+
+        //delete single seller api
+
+        app.delete('/sellers/:id', async(req, res) => {
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)}
+            const result = await usersCollection.deleteOne(filter)
+            res.send(result)
+        })
 
 
 
