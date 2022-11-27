@@ -124,7 +124,7 @@ async function run() {
         //delete single buyer api 
         app.delete('/buyers/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: ObjectId(id)}
+            const filter = { _id: ObjectId(id) }
             const result = await usersCollection.deleteOne(filter)
             res.send(result)
         })
@@ -132,9 +132,9 @@ async function run() {
 
         //delete single seller api
 
-        app.delete('/sellers/:id', async(req, res) => {
+        app.delete('/sellers/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: ObjectId(id)}
+            const filter = { _id: ObjectId(id) }
             const result = await usersCollection.deleteOne(filter)
             res.send(result)
         })
@@ -182,6 +182,16 @@ async function run() {
             const result = await usersCollection.updateOne(query, updatedDoc, options)
             res.send(result)
         })
+
+        //seller add products in products collection
+
+        app.post('/products', async (req, res) => {
+            const product = req.body;
+            const result = await productsCollection.insertOne(product)
+            res.send(result)
+        })
+
+
 
 
 
