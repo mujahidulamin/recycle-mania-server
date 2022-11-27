@@ -6,7 +6,7 @@ const port = process.env.PORT || 5000
 require('dotenv').config();
 const app = express();
 
-
+const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 //middleware
 app.use(cors())
@@ -47,6 +47,8 @@ async function run() {
         const bookingCollection = client.db('recycleMania').collection('bookings')
         const usersCollection = client.db('recycleMania').collection('users')
         const reportsCollection = client.db('recycleMania').collection('reports')
+        const paymentsCollection = client.db('recycleMania').collection('payments')
+
 
 
         //all categories
@@ -90,6 +92,17 @@ async function run() {
             const result = await bookingCollection.insertOne(booking)
             res.send(result)
         })
+
+
+        //bookings id diye data get for payment
+        app.get('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const booking = await bookingCollection.findOne(query);
+            res.send(booking)
+        })
+
+
 
 
         //user post with role api
@@ -216,17 +229,55 @@ async function run() {
 
 
         //get all the reports item
-        app.get('/reports', async(req, res) => {
+        app.get('/reports', async (req, res) => {
             const query = {}
             const result = await reportsCollection.find(query).toArray();
-            res.send(result); 
+            res.send(result);
         })
 
         //delete a single report item api
-        app.delete('/reports/:id', async(req, res) => {
+        app.delete('/reports/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id : ObjectId(id)};
+            const filter = { _id: ObjectId(id) };
             const result = await reportsCollection.deleteOne(filter);
+            res.send(result)
+        })
+
+
+
+        //stripe payment api
+
+        app.post("/create-payment-intent", async (req, res) => {
+            const booking = req.body;
+            const price = booking.price;
+            const amount = price * 100;
+
+            const paymentIntent = await stripe.paymentIntents.create({
+                currency: 'usd',
+                amount: amount,
+                "payment_method_types": [
+                    "card"
+                ]
+            })
+            res.send({
+                clientSecret: paymentIntent.client_secret,
+            });
+        });
+
+        //payments collection 
+
+        app.post('/payments', async (req, res) => {
+            const payment = req.body;
+            const result = await paymentsCollection.insertOne(payment)
+            const id = payment.ordersId;
+            const filter = { _id: ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment.transactionId
+                }
+            }
+            const updateResult = await bookingCollection.updateOne(filter, updatedDoc)
             res.send(result)
         })
 
