@@ -295,13 +295,18 @@ async function run() {
 
 
         //advertise a product api
-        app.post('/advertise' , async(req, res) => {
+        app.post('/advertise', async (req, res) => {
             const advertise = req.body;
             const result = await advertiseCollection.insertOne(advertise)
             res.send(result)
         })
 
-
+        //get all the advertise item
+        app.get('/advertise', async (req, res) => {
+            const query = {}
+            const result = await advertiseCollection.find(query).toArray();
+            res.send(result);
+        })
 
 
     }
