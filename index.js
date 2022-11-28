@@ -93,7 +93,6 @@ async function run() {
             res.send(result)
         })
 
-
         //bookings id diye data get for payment
         app.get('/bookings/:id', async (req, res) => {
             const id = req.params.id;
@@ -101,9 +100,6 @@ async function run() {
             const booking = await bookingCollection.findOne(query);
             res.send(booking)
         })
-
-
-
 
         //user post with role api
 
@@ -125,10 +121,9 @@ async function run() {
             res.status(403).send({ accessToken: '' })
         })
 
-
-
         //get all buyers api        
         app.get('/buyers', async (req, res) => {
+
             const role = req.query.role;
             const query = { role: role }
             const users = await usersCollection.find(query).toArray()
@@ -163,11 +158,6 @@ async function run() {
             res.send(users);
         })
 
-
-
-
-
-
         //admin verified api
         app.get('/buyers/admin/:email', async (req, res) => {
             const email = req.params.email;
@@ -199,10 +189,33 @@ async function run() {
 
         //seller add products in products collection
 
-        app.post('/products', async (req, res) => {
+        app.post('/products', verifyJWT, async (req, res) => {
+            const decodedEmail = req.decoded.email
+            const query = { email: decodedEmail }
+            const user = await usersCollection.findOne(query)
+            if (user.role !== 'seller') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
             const product = req.body;
             const result = await productsCollection.insertOne(product)
             res.send(result)
+        })
+
+
+        //seller route only seller can go that route
+        app.get('/users/seller/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query)
+            res.send({ isSeller: user?.role === 'seller' })
+        })
+
+        //buyer route only seller can go that route
+        app.get('/users/buyer/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query)
+            res.send({ isBuyer: user?.role === 'buyer' })
         })
 
         app.get('/products', async (req, res) => {
@@ -242,8 +255,6 @@ async function run() {
             const result = await reportsCollection.deleteOne(filter);
             res.send(result)
         })
-
-
 
         //stripe payment api
 
