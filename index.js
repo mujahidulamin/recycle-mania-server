@@ -48,6 +48,7 @@ async function run() {
         const usersCollection = client.db('recycleMania').collection('users')
         const reportsCollection = client.db('recycleMania').collection('reports')
         const paymentsCollection = client.db('recycleMania').collection('payments')
+        const advertiseCollection = client.db('recycleMania').collection('advertise')
 
 
 
@@ -291,6 +292,16 @@ async function run() {
             const updateResult = await bookingCollection.updateOne(filter, updatedDoc)
             res.send(result)
         })
+
+
+        //advertise a product api
+        app.post('/advertise' , async(req, res) => {
+            const advertise = req.body;
+            const result = await advertiseCollection.insertOne(advertise)
+            res.send(result)
+        })
+
+
 
 
     }
